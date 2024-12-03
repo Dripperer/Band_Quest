@@ -1,252 +1,66 @@
-from flask import Flask, render_template_string, request, jsonify
+const express = require('express');
+const bodyParser = require('body-parser');
+const app = express();
+const PORT = 3000;
 
-app = Flask(__name__)
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
-quiz_data = [
-    {"question": "Come si chiama la nostra prima canzone?", "answers": ["Drip&chill", "Drip&drill", "Chill&relax"], "correct": "Drip&chill"},
-    {"question": "In quanti eravamo all'inizio?", "answers": ["3", "6", "5"], "correct": "5"},
-    {"question": "Qual è il nostro genere principale?", "answers": ["Poprock", "Trap", "Pop"], "correct": "Poprock"},
-    {"question": "Chi è il batterista?", "answers": ["Andrea", "Sebasthian"], "correct": "Sebasthian"},
-    {"question": "All'inizio di Drip&chill che strumento c'è?", "answers": ["Basso", "Chitarra", "Batteria"], "correct": "Batteria"},
-    {"question": "Quando è nata la band?", "answers": ["Luglio 2023", "Ottobre 2024", "Luglio 2024"], "correct": "Luglio 2023"}
-]
+let quizData = [
+    { "question": "Come si chiama la nostra prima canzone?", "answers": ["Drip&chill", "Drip&drill", "Chill&relax"], "correct": "Drip&chill" },
+    { "question": "In quanti eravamo all'inizio?", "answers": ["3", "6", "5"], "correct": "5" },
+    { "question": "Qual è il nostro genere principale?", "answers": ["Poprock", "Trap", "Pop"], "correct": "Poprock" },
+    { "question": "Chi è il batterista?", "answers": ["Andrea", "Sebasthian"], "correct": "Sebasthian" },
+    { "question": "All'inizio di Drip&chill che strumento c'è?", "answers": ["Basso", "Chitarra", "Batteria"], "correct": "Batteria" },
+    { "question": "Quando è nata la band?", "answers": ["Luglio 2023", "Ottobre 2024", "Luglio 2024"], "correct": "Luglio 2023" }
+];
 
-leaderboard_data = []
+let leaderboardData = [];
 
-@app.route('/')
-def index():
-    return render_template_string('''
-    <!DOCTYPE html>
-    <html lang="it">
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>BandQuest</title>
-      <style>
-          body {
-              font-family: 'Comic Sans MS', sans-serif;
-              margin: 0;
-              padding: 0;
-              background-color: #f0f0f0;
-              color: #333;
-          }
-          header, footer {
-              background-color: #4CAF50;
-              color: white;
-              text-align: center;
-              padding: 1em 0;
-          }
-          .container {
-              padding: 2em;
-          }
-          .login {
-              text-align: center;
-              margin-top: 50px;
-          }
-          .quiz-question {
-              margin: 1em 0;
-          }
-          .btn {
-              background-color: #4CAF50;
-              color: white;
-              padding: 0.5em 1em;
-              border: none;
-              cursor: pointer;
-          }
-          .feedback {
-              font-weight: bold;
-              display: none;
-          }
-          .feedback.correct {
-              color: green;
-          }
-          .feedback.incorrect {
-              color: red;
-          }
-          .header-info {
-              display: flex;
-              justify-content: space-between;
-              align-items: center;
-              padding: 0 1em;
-          }
-          .leaderboard {
-              margin-top: 2em;
-              text-align: left;
-          }
-          .leaderboard h2 {
-              text-align: center;
-          }
-          .leaderboard .close {
-              text-align: center;
-              cursor: pointer;
-              color: white;
-              background-color: red;
-              padding: 0.2em 1em;
-              border-radius: 10px;
-          }
-          .tiktok-links {
-              margin-top: 1em;
-          }
-      </style>
-    </head>
-    <body>
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/index.html');
+});
 
-    <header>
-      <div class="header-info">
-          <div id="time-remaining">Tempo rimanente: 7 giorni</div>
-          <h1>BandQuest</h1>
-          <button id="exit-btn" style="display: none;" class="btn" onclick="exitQuiz()">Esci</button>
-      </div>
-      <p>Benvenuto nel gioco della tua band preferita!</p>
-    </header>
+app.post('/login', (req, res) => {
+    const { username, password } = req.body;
 
-    <div class="container" id="login-screen">
-      <div class="login">
-          <h2>Accesso</h2>
-          <input type="text" id="username" placeholder="Nome utente"><br><br>
-          <input type="password" id="password" placeholder="Password"><br><br>
-          <button class="btn" onclick="login()">Accedi</button>
-          <p id="login-error" style="color: red; display: none;">Password errata!</p>
-      </div>
-    </div>
+    if (username === 'admin' && password === 'admin') {  // Usa credenziali di esempio
+        res.json({ success: true });
+    } else {
+        res.json({ success: false });
+    }
+});
 
-    <div class="container" id="question-list" style="display: none;">
-      <h2>Lista delle Domande</h2>
-      <ul id="question-list-ul">
-      </ul>
-      <div>
-          <input type="text" placeholder="Link TikTok 1" class="tiktok-link">
-          <input type="text" placeholder="Link TikTok 2" class="tiktok-link">
-          <button class="btn" onclick="addVideoField()">+</button>
-      </div>
-      <button class="btn" onclick="submitVideos()">Invia Video</button>
-      <button class="btn" onclick="showLeaderboard()">Classifica Sfida!</button>
-    </div>
+app.get('/quiz', (req, res) => {
+    res.json(quizData);
+});
 
-    <div class="container" id="quiz-screen" style="display: none;">
-      <h2>Sfide Settimanali</h2>
-      <p>Completa le sfide settimanali per guadagnare punti e vincere fantastici premi!</p>
+app.post('/check_answer', (req, res) => {
+    const { question_index, user_answer } = req.body;
+    const correct_answer = quizData[question_index].correct;
 
-      <div class="quiz" id="question-container">
-          <!-- Le domande saranno caricate qui -->
-      </div>
+    res.json({ correct: user_answer === correct_answer });
+});
 
-      <div class="leaderboard" id="leaderboard-container" style="display: none;">
-          <h2>Classifica</h2>
-          <div class="close" onclick="closeLeaderboard()">X</div>
-          <ol id="leaderboard-list">
-              <!-- La classifica sarà caricata qui -->
-          </ol>
-      </div>
-    </div>
+app.post('/add_points', (req, res) => {
+    const { points } = req.body;
+    leaderboardData.push({ name: "User", points: parseInt(points) });
 
-    <footer>
-      <p>&copy; 2024 BandQuest. Tutti i diritti riservati.</p>
-    </footer>
+    res.json({ success: true });
+});
 
-    <script>
-      async function login() {
-          const username = document.getElementById('username').value;
-          const password = document.getElementById('password').value;
+app.get('/leaderboard', (req, res) => {
+    res.json(leaderboardData.sort((a, b) => b.points - a.points));
+});
 
-          const response = await fetch('/login', {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/x-www-form-urlencoded'
-              },
-              body: `username=${username}&password=${password}`
-          });
+app.post('/submit_videos', (req, res) => {
+    const { videos } = req.body;
+    const points = videos.length * 5;
+    leaderboardData.push({ name: "User", points: points });
 
-          const result = await response.json();
+    res.json({ success: true });
+});
 
-          if (result.success) {
-              document.getElementById('login-error').style.display = 'none';
-              document.getElementById('login-screen').style.display = 'none';
-              document.getElementById('question-list').style.display = 'block';
-              loadQuestions();
-          } else {
-              document.getElementById('login-error').style.display = 'block';
-          }
-      }
-
-      async function loadQuestions() {
-          const response = await fetch('/quiz');
-          const questions = await response.json();
-
-          const questionList = document.getElementById('question-list-ul');
-          questionList.innerHTML = '';
-          questions.forEach((q, index) => {
-              const listItem = document.createElement('li');
-              const button = document.createElement('button');
-              button.className = 'btn';
-              button.textContent = `Domanda ${index + 1}`;
-              button.onclick = () => showQuestion(index);
-              listItem.appendChild(button);
-              questionList.appendChild(listItem);
-          });
-      }
-
-      async function showQuestion(index) {
-          const response = await fetch('/quiz');
-          const questions = await response.json();
-          const question = questions[index];
-
-          const questionContainer = document.getElementById('question-container');
-          questionContainer.innerHTML = `
-              <div class="quiz-question" data-answer="${question.correct}">
-                  <p>${question.question}</p>
-                  ${question.answers.map(answer => `<button class="btn" onclick="checkAnswer(this, '${answer}', ${index})">${answer}</button>`).join('')}
-                  <p class="feedback"></p>
-              </div>
-          `;
-
-          document.getElementById('question-list').style.display = 'none';
-          document.getElementById('quiz-screen').style.display = 'block';
-      }
-
-      async function checkAnswer(button, userAnswer, index) {
-          const response = await fetch('/check_answer', {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/x-www-form-urlencoded'
-              },
-              body: `question_index=${index}&user_answer=${userAnswer}`
-          });
-
-          const result = await response.json();
-          const feedback = button.parentElement.querySelector('.feedback');
-
-          if (result.correct) {
-              feedback.textContent = 'Risposta Corretta!';
-              feedback.className = 'feedback correct';
-              addPoints(10);
-          } else {
-              feedback.textContent = 'Risposta Sbagliata!';
-              feedback.className = 'feedback incorrect';
-          }
-
-          feedback.style.display = 'block';
-      }
-
-      function addPoints(points) {
-          fetch('/add_points', {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/x-www-form-urlencoded'
-              },
-              body: `points=${points}`
-          });
-      }
-
-      function addVideoField() {
-          const container = document.createElement('div');
-          const input = document.createElement('input');
-          input.type = 'text';
-          input.placeholder = 'Link TikTok';
-          input.className = 'tiktok-link';
-          container.appendChild(input);
-          document.querySelector('#question-list').appendChild(container);
-      }
-
-      async function submitVideos() {
-          const videoLinks
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
