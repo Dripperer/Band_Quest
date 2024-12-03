@@ -236,4 +236,17 @@ def index():
               },
               body: `points=${points}`
           });
-        }
+      }
+
+      function addVideoField() {
+          const container = document.createElement('div');
+          const input = document.createElement('input');
+          input.type = 'text';
+          input.placeholder = 'Link TikTok';
+          input.className = 'tiktok-link';
+          container.appendChild(input);
+          document.querySelector('#question-list').appendChild(container);
+      }
+
+      async function submitVideos() {
+          const videoLinks
