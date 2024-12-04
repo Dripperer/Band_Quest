@@ -1,4 +1,4 @@
-from flask import Flask, render_template_string, request, jsonify
+from flask import Flask, render_template, request, jsonify
 
 app = Flask(__name__)
 
@@ -15,14 +15,14 @@ leaderboard_data = []
 
 @app.route('/')
 def index():
-    return render_template_string(open('index.html').read())
+    return render_template('index.html')
 
 @app.route('/login', methods=['POST'])
 def login():
     username = request.form.get('username')
     password = request.form.get('password')
 
-    if username == 'admin' and password == 'admin':  # Usa credenziali di esempio
+    if username == 'admin' and password == 'admin':
         return jsonify(success=True)
     else:
         return jsonify(success=False)

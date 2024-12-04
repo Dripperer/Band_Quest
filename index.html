@@ -94,8 +94,7 @@
 
 <div class="container" id="question-list" style="display: none;">
   <h2>Lista delle Domande</h2>
-  <ul id="question-list-ul">
-  </ul>
+  <ul id="question-list-ul"></ul>
   <div>
       <input type="text" placeholder="Link TikTok 1" class="tiktok-link">
       <input type="text" placeholder="Link TikTok 2" class="tiktok-link">
@@ -108,78 +107,8 @@
 <div class="container" id="quiz-screen" style="display: none;">
   <h2>Sfide Settimanali</h2>
   <p>Completa le sfide settimanali per guadagnare punti e vincere fantastici premi!</p>
-
-  <div class="quiz" id="question-container">
-      <!-- Le domande saranno caricate qui -->
-  </div>
-
+  <div class="quiz" id="question-container"></div>
   <div class="leaderboard" id="leaderboard-container" style="display: none;">
       <h2>Classifica</h2>
       <div class="close" onclick="closeLeaderboard()">X</div>
-      <ol id="leaderboard-list">
-          <!-- La classifica sarà caricata qui -->
-      </ol>
-  </div>
-</div>
-
-<footer>
-  <p>&copy; 2024 BandQuest. Tutti i diritti riservati.</p>
-</footer>
-
-<script>
-  async function login() {
-      const username = document.getElementById('username').value;
-      const password = document.getElementById('password').value;
-
-      const response = await fetch('/login', {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/x-www-form-urlencoded'
-          },
-          body: `username=${username}&password=${password}`
-      });
-
-      const result = await response.json();
-
-      if (result.success) {
-          document.getElementById('login-error').style.display = 'none';
-          document.getElementById('login-screen').style.display = 'none';
-          document.getElementById('question-list').style.display = 'block';
-          loadQuestions();
-      } else {
-          document.getElementById('login-error').style.display = 'block';
-      }
-  }
-
-  async function loadQuestions() {
-      const response = await fetch('/quiz');
-      const questions = await response.json();
-
-      const questionList = document.getElementById('question-list-ul');
-      questionList.innerHTML = '';
-      questions.forEach((q, index) => {
-          const listItem = document.createElement('li');
-          const button = document.createElement('button');
-          button.className = 'btn';
-          button.textContent = `Domanda ${index + 1}`;
-          button.onclick = () => showQuestion(index);
-          listItem.appendChild(button);
-          questionList.appendChild(listItem);
-      });
-  }
-
-  async function showQuestion(index) {
-      const response = await fetch('/quiz');
-      const questions = await response.json();
-      const question = questions[index];
-
-      const questionContainer = document.getElementById('question-container');
-      questionContainer.innerHTML = `
-          <div class="quiz-question" data-answer="${question.correct}">
-              <p>${question.question}</p>
-              ${question.answers.map(answer => `<button class="btn" onclick="checkAnswer(this, '${answer}', ${index})">${answer}</button>`).join('')}
-              <p class="feedback"></p>
-          </div>
-      `;
-
-      document.getElementById}
+      <ol id="leaderboard
