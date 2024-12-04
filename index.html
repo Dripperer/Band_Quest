@@ -85,9 +85,9 @@
 <div class="container" id="login-screen">
   <div class="login">
       <h2>Accesso</h2>
-      <input type="text" id="username" placeholder="Nome utente"><br><br>
-      <input type="password" id="password" placeholder="Password"><br><br>
-      <button class="btn" onclick="login()">Accedi</button>
+      <input type="text" id="username" placeholder="Nome utente" oninput="checkCredentials()"><br><br>
+      <input type="password" id="password" placeholder="Password" oninput="checkCredentials()"><br><br>
+      <button id="login-btn" class="btn" onclick="login()" disabled>→</button>
       <p id="login-error" style="color: red; display: none;">Password errata!</p>
   </div>
 </div>
@@ -182,87 +182,4 @@
           </div>
       `;
 
-      document.getElementById('question-list').style.display = 'none';
-      document.getElementById('quiz-screen').style.display = 'block';
-  }
-
-  async function checkAnswer(button, userAnswer, index) {
-      const response = await fetch('/check_answer', {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/x-www-form-urlencoded'
-          },
-          body: `question_index=${index}&user_answer=${userAnswer}`
-      });
-
-      const result = await response.json();
-      const feedback = button.parentElement.querySelector('.feedback');
-
-      if (result.correct) {
-          feedback.textContent = 'Risposta Corretta!';
-          feedback.className = 'feedback correct';
-          addPoints(10);
-      } else {
-          feedback.textContent = 'Risposta Sbagliata!';
-          feedback.className = 'feedback incorrect';
-      }
-
-      feedback.style.display = 'block';
-  }
-
-  function addPoints(points) {
-      fetch('/add_points', {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/x-www-form-urlencoded'
-          },
-          body: `points=${points}`
-      });
-  }
-
-  function addVideoField() {
-      const container = document.createElement('div');
-      const input = document.createElement('input');
-      input.type = 'text';
-      input.placeholder = 'Link TikTok';
-      input.className = 'tiktok-link';
-      container.appendChild(input);
-      document.querySelector('.container').appendChild(container);
-  }
-
-  async function submitVideos() {
-      const videoLinks = Array.from(document.querySelectorAll('.tiktok-link')).map(input => input.value);
-      const response = await fetch('/submit_videos', {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ videos: videoLinks })
-      });
-
-      if (response.ok) {
-          addPoints(videoLinks.length * 5);
-          alert('Video inviati correttamente!');
-      }
-  }
-
-  function showLeaderboard() {
-      fetch('/leaderboard')
-          .then(response => response.json())
-          .then(data => {
-              const leaderboardList = document.getElementById('leaderboard-list');
-              leaderboardList.innerHTML = '';
-              data.forEach((entry, index) => {
-                  const listItem = document.createElement('li');
-                  listItem.textContent = `${index + 1}. ${entry.name}: ${entry.points} punti`;
-                  leaderboardList.appendChild(listItem);
-              });
-              document.getElementById('question-list').style.display = 'none';
-              document.getElementById('leaderboard-container').style.display = 'block';
-          });
-  }
-
-  function closeLeaderboard() {
-      document.getElementById('leaderboard-container').style.display = 'none';
-      document.getElementById('question-list').style.display = 'block';
-  }
+        }
